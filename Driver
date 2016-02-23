@@ -1,0 +1,188 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.JDialog;
+import java.beans.*;
+import java.awt.*;
+import java.awt.event.*;
+
+
+/**
+ * 
+ * 
+ * Project #1
+ * CS 2334, Section 010/012
+ * ****February 15, 2016*****
+ * <P>
+ * This class is where the movie file will be imported, and will also contain
+ * an ArrayList library, that will store all the movie information after it has 
+ * been sorted by the movie class. This class is also where the movie will be found and 
+ * shown to the user.
+ * </P>
+ * @version 2.0
+ * 
+ *
+ */
+public class Driver {
+
+	/** A public ArrayList library that will store movies of type movie*/
+	public static ArrayList<Movie> movieLibrary= new ArrayList<Movie>();
+	
+	public static ArrayList<TV> tvLibrary= new ArrayList<TV>();
+	/**A public ArrayList movieData that will store the data of movies in type String*/
+	public ArrayList<String> movieData= new ArrayList<String>();
+	/**A public String input which will store the user's input*/
+	public String input="";
+
+
+	/**
+	 * This method is the main method, where the file will be read in and stored, and also where 
+	 * the Library ArrayList will add movies to its collection. The user's initial input will also be taken in here, and
+	 * later sent to the search method for further use.
+	 * @param args
+	 * @return void
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException{
+
+
+		//importing the file and reading it. Also sending stuff to the movie class to be constructed.
+		File file= new File(args[0]);
+		File file2= new File(args[1]);
+		String fileInfo;
+		String fileInfo2;
+
+		BufferedReader br= new BufferedReader(new FileReader(file));
+		fileInfo=br.readLine();
+		while(fileInfo != null){
+
+
+			Movie movieStuff= new Movie(fileInfo);
+			movieLibrary.add(movieStuff);
+
+
+			fileInfo=br.readLine();
+
+
+		}
+		
+		
+		BufferedReader br2= new BufferedReader(new FileReader(file2));
+		fileInfo2=br2.readLine();
+		while(fileInfo2 != null){
+			
+			
+			TV tvStuff= new TV(fileInfo2);
+			tvLibrary.add(tvStuff);
+			
+			
+			fileInfo2= br2.readLine();
+		}
+		
+
+
+		br.close();
+		br2.close();
+
+		/**Citation: http://www.java2s.com/Code/Java/File-Input-Output/Readatextfile.htm*/
+		//got this info(bufferedReaderstuff) from http://www.java2s.com/Code/Java/File-Input-Output/Readatextfile.htm
+
+
+		//Getting user input and storing it in inputValue
+
+		String inputValue= JOptionPane.showInputDialog("What movie are you searching for?");
+
+		
+		//loop that ensures the program will continue to run after first input, and also if the user selects cancel or 
+		//enters nothing by pressing 'Enter'
+		while(inputValue != null){
+
+			//If user enters nothing, will prompt the user for an input
+			while(inputValue.equals("")){
+
+				JOptionPane.showMessageDialog(null, "Please input a movie");
+				inputValue=JOptionPane.showInputDialog("What movie are you searching for?");
+				//search(library, inputValue);
+			}
+			search(movieLibrary,inputValue );
+			inputValue= JOptionPane.showInputDialog("What movie are you searching for?");
+
+		}
+
+
+		
+
+
+
+		return;
+	}
+	/**
+	 * This method is going to take the library arraylist and a String representation of the user's input, 
+	 * search through the library to see if any item in the arraylist contains the users input, and if so will, via 
+	 * a JOptionPane, tell the user the movies that were found, and if the input cannot be found in any of the items in 
+	 * the library, will tell the user that the movie is not in the database.   
+	 * @param library, an ArrayList of type movie
+	 * @param inputValue, a String representation of the users input.
+	 * @return inputValue, a String representation of the user's input.
+	 */
+	public static String search(ArrayList<Movie>library, String inputValue){
+		/**An arraylist of type movie that the found movies will be stored in**/
+		ArrayList<Movie> foundMovies= new ArrayList<Movie>();
+
+		
+		/**a temporary placeholder for the lower case string representation of the user input*/
+		String temp= inputValue.toLowerCase();
+		/**an integer (i) that will store the amount of found movies */
+		int i=0;
+
+		
+		//loop through the library arraylist to see if any of the movies contain what the user is searching for,
+		//and then incrementing i if a movie is found.
+		for (Movie mov: library){
+			if(mov.getTitle().toLowerCase().contains(temp)){
+				foundMovies.add(mov);
+				++i;
+			}
+
+
+
+
+
+
+		}
+
+
+		//if a movie was found, and then i had a value greater than zero, this will loop through the found movies and 
+		//add them to a string output, which will then be shown to the user.
+		if(i>0){
+			String output = "";
+			for(Movie mov: foundMovies){
+				output+=mov + "\n";
+			}
+
+			JOptionPane.showMessageDialog( null, "The movie was found: " + "\n" + output);
+
+
+		}
+		
+		
+		//if no movies were found, and thus i remained zero, this will show the user that the movie is not in the database.
+		if(i==0)
+		{
+
+			JOptionPane.showMessageDialog( null, "That movie is not in our database");
+		}
+
+
+		return inputValue;
+	}
+
+
+
+}
