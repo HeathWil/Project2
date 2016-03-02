@@ -1,9 +1,10 @@
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
 /**
- * *******Feb 19, 2014**********
+ * *******March 1, 2016**********
  * 
  * This class is going to take in a string of all the tv show data in the file and construct
  * it into a tvSeries object, parse it, and store
@@ -11,10 +12,10 @@ import java.util.StringTokenizer;
  * 
  *
  */
-public class TV {
+public class TV  {
 
 	/**An arrayList of type String that will store the data of the tv show*/
-	private ArrayList<String> data= new ArrayList<String>();
+	private List<String> data= new ArrayList<String>();
 	/**A String representation of the series' title*/
 	private String title="";
 	/** A String representation of the year found by the title in the file*/
@@ -114,6 +115,7 @@ public class TV {
 				//storing the substring found into the episode num
 				String substring= episodeOrYear.substring(endx + 1, beginningx);
 
+				//splitting into season and episode
 				String [] seasonandep=substring.trim().split("\\.");
 
 				episodeNum=seasonandep[1];
@@ -125,6 +127,7 @@ public class TV {
 				--i;
 				findingEp=data.get(i);
 
+				//will find the episode title until it reaches the beginning of intro year
 				while(!findingEp.contains(")")){
 
 					episode+=data.get(i) + " ";
@@ -133,7 +136,7 @@ public class TV {
 
 
 				}
-
+				//finding and storing the intro year
 				String yearOrTitle=data.get(i);
 				if(yearOrTitle.charAt(yearOrTitle.length()-1) == ')'){
 					introYear=yearOrTitle;
@@ -195,7 +198,7 @@ public class TV {
 
 					String substring2= episodeOrYear.substring(endx + 1, beginningx);
 
-
+					//splitting into season and episode
 					String [] seasonandep=substring2.trim().split("\\.");
 
 					episodeNum=seasonandep[1];
@@ -206,6 +209,7 @@ public class TV {
 					--i;
 					findingEp=data.get(i);
 
+					//will find the episode and stop when it finds the beginning of intro year
 					while(!findingEp.contains(")")){
 
 						episode+=data.get(i) + " ";
@@ -214,7 +218,7 @@ public class TV {
 
 
 					}
-
+					//storing intro year
 					String yearOrTitle=data.get(i);
 					if(yearOrTitle.charAt(yearOrTitle.length()-1) == ')'){
 						introYear=yearOrTitle;
@@ -227,17 +231,22 @@ public class TV {
 
 
 
-
+			//this handles the instance that the episode has neither a seasonNum/episodeNum and is not suspended. It also will find the rest of the 
+			//data accordingly
 			if(episodeOrYear.charAt(episodeOrYear.length()-2) != '}'| episodeOrYear.charAt(episodeOrYear.length()-2) != ')'){
 
 				String findingEp="";
 				findingEp=data.get(i);
 				while(!findingEp.contains(")")){
+
+
 					episode+=findingEp + " ";
 					--i;
 					findingEp=data.get(i);
-				}
 
+
+				}
+				//if the yearOrTitle is holding data surrounded by parenthesis, it is 'looking' at the intro year and will store it as such. 
 				String yearOrTitle=data.get(i);
 				if(yearOrTitle.charAt(yearOrTitle.length()-1) == ')'){
 					introYear=yearOrTitle;
@@ -245,9 +254,12 @@ public class TV {
 
 
 				}
+
+
+
 				--i;
 				yearOrTitle=data.get(i);
-
+				//Every tv series title is surrounded by quotations, so this loops sees if quotations are present, and if so, will find the series title. 
 				if(yearOrTitle.contains("\"")){
 
 					while(i>=0){
@@ -265,7 +277,7 @@ public class TV {
 
 
 
-
+		//This handles the instance that there is no episode season/number or title. Loop will go straight to intro year, and then find the title. 
 		if(episodeOrYear.charAt(episodeOrYear.length()-1) == ')'){
 			while(i>=0){
 				introYear=data.get(i);
@@ -282,14 +294,36 @@ public class TV {
 
 
 
-
-
-
 		title=reverse(title);
 		episode=reverse(episode);
 
+		//This loop is to make the { at the beginning of the episode title be removed
+		if(episode.contains("{")){
 
-		System.out.println(years + " " + suspended + " " + seasonNum + " " + episodeNum + " " + episode + " " + introYear + " " + title);
+			int endx=episode.length();
+			int x=episode.length()-1;
+			//This loop handles the instance of if an episode title has both { and }
+			if(episode.contains("}")){
+				while(episode.charAt(x) != '}'){
+					--x;
+				}
+				endx=x;
+			}
+
+			while(episode.charAt(x) != '{'){
+				--x;
+			}
+
+			int beginningx=x;
+
+			episode=episode.substring(beginningx+1, endx);
+		}
+
+
+
+
+		//testing it out
+		//System.out.println(years + " " + suspended + " " + seasonNum + " " + episodeNum + " " + episode + " " + introYear + " " + title);
 
 
 
@@ -382,6 +416,14 @@ public class TV {
 	}
 
 	/**
+	 * 
+	 * @return suspended, A String representation if the show was suspended
+	 */
+	public String getSuspended(){
+		return suspended;
+	}
+
+	/**
 	 * this method finds whether what the user is looking for is or is not in the library
 	 * @param temp, A string of what the user is searching for
 	 * @return boolean true or false depending whether it is found in the library
@@ -395,7 +437,70 @@ public class TV {
 	 * this method converts the data into a string
 	 */
 	public String toString(){
-		return title + " " + introYear + " " + episode + " " + seasonNum + "." + episodeNum + " " + years;
+		return title + " " + introYear + " " + episode + " " + seasonNum + "." + episodeNum + " " + years + "\n";
+	}
+	/**
+	 * 
+	 * @param data
+	 */
+	public void setData(List<String> data) {
+		this.data = data;
+	}
+	/**
+	 * 
+	 * @param title
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	/**
+	 * 
+	 * @param introYear
+	 */
+	public void setIntroYear(String introYear) {
+		this.introYear = introYear;
+	}
+	/**
+	 * 
+	 * @param episode
+	 */
+	public void setEpisode(String episode) {
+		this.episode = episode;
+	}
+	/**
+	 * 
+	 * @param episodeNum
+	 */
+	public void setEpisodeNum(String episodeNum) {
+		this.episodeNum = episodeNum;
+	}
+	/**
+	 * 
+	 * @param seasonNum
+	 */
+	public void setSeasonNum(String seasonNum) {
+		this.seasonNum = seasonNum;
+	}
+	/**
+	 * 
+	 * @param suspended
+	 */
+	public void setSuspended(String suspended) {
+		this.suspended = suspended;
+	}
+	/**
+	 * 
+	 * @param years
+	 */
+	public void setYears(String years) {
+		this.years = years;
+	}
+	/**
+	 * 
+	 * @param tvData
+	 */
+	public void setTvData(String tvData) {
+		this.tvData = tvData;
 	}
 
 
